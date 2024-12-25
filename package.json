@@ -5,6 +5,10 @@
   "author": "GeraldAC <200332@unsaac.edu.pe>",
   "license": "MIT",
   "private": false,
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
   "devDependencies": {
     "nodemon": "^3.1.9"
   }
