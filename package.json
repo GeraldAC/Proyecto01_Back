@@ -1,0 +1,11 @@
+{
+  "name": "Proyecto01",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "GeraldAC <200332@unsaac.edu.pe>",
+  "license": "MIT",
+  "private": false,
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
