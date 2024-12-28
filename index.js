@@ -11,7 +11,7 @@ const Schema = mongoose.Schema
 mongoose
     .connect(process.env.MONGODB_URL)
     .then(() => {
-        console.log("Conexión a la base de datos establecida...")
+        console.log("Conexión a la base de datos establecida MongoDB...")
     })
     .catch((err) => {
         console.log("Error al conectarse a la base de datos...", {err});
