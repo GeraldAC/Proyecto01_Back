@@ -1,9 +1,20 @@
-const express = require("express")
-const { getCode, login } = require("../controllers/auth")
-const router = express.Router()
+const express = require("express");
+const { getCode, login } = require("../controllers/auth");
+const router = express.Router();
 
-router.post("/login/:email/code", getCode)
+/**
+ * -- Ruta para solicitar un código de inicio de sesión.
+ * -- @route POST /login/:email/code
+ * -- @param {string} email - Dirección de correo electrónico del usuario.
+ */
+router.post("/login/:email/code", getCode);
 
-router.post("/login/:email", login)
+/**
+ * -- Ruta para iniciar sesión con el código proporcionado.
+ * -- @route POST /login/:email
+ * -- @param {string} email - Dirección de correo electrónico del usuario.
+ */
+router.post("/login/:email", login);
 
-module.exports = router
+// -- Exportar el enrutador
+module.exports = router;
