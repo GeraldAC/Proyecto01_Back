@@ -6,36 +6,32 @@ const input = document.querySelector("#task-name")
 const tasksDiv = document.querySelector("#tasks")
 
 const baseBackendUrl = `${window.origin}/api`
-console.log({ window, baseBackendUrl });
-
 
 let TASK_TO_EDIT = null
 
 // -- Agregar funcionalidad a los botones
-createEditBtn.addEventListener("click", () => {
+createEditBtn.addEventListener("click", async () => {
     const creating = !TASK_TO_EDIT
     const path = creating ? "tasks" : `tasks/${TASK_TO_EDIT._id}`
     const method = creating ? "POST" : "PUT"
-    fetch(`${baseBackendUrl}/${path}`, {
+    
+    const res = await fetch(`${baseBackendUrl}/${path}`, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: input.value })
-    }).then((res) => {
-        getTasks()
-        input.value = ""
-        createEditBtn.innerText = "Crear tarea"
-        return res.json()
-    }).then((resJSON) => {
-        console.log({ resJSON })
     })
+    getTasks()
+    input.value = ""
+    createEditBtn.innerText = "Crear tarea"
+    const resJSON = await res.json()
+    console.log({ resJSON })
 })
 
-function getTasks() {
-    tasksDiv.innerHTML = null
-    fetch(`${baseBackendUrl}/tasks`)
-    .then((res) => {
-        return res.json()
-    }).then((resJSON) => {
+async function getTasks() {
+    try {
+        tasksDiv.innerHTML = null
+        const res = await fetch(`${baseBackendUrl}/tasks`)
+        const resJSON = await res.json()
         const tasks = resJSON.data
         for (const task of tasks) {
             const taskParagraph = document.createElement("p")
@@ -64,7 +60,11 @@ function getTasks() {
             taskContainerDiv.appendChild(deleteTaskBtn)
             tasksDiv.appendChild(taskContainerDiv)
         }
-    })
+    } catch (error) {
+        console.log({ error });
+    } finally {
+        TASK_TO_EDIT = null
+    }
 }
 
 getTasks()

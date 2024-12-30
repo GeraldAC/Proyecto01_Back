@@ -1,88 +1,46 @@
+// -- Importar dependencias
 require("dotenv").config()
-
+// -- Importar librerías
 const express = require('express')
+// -- Crear aplicación
 const app = express()
-const port = process.env.PORT
 
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
+// -- Importar librerías
+const dbconnect = require("./db/connect")
 
-// -- Configurar conexión a la base de datos
-mongoose
-    .connect(process.env.MONGODB_URL)
-    .then(() => {
-        console.log("Conexión a la base de datos establecida MongoDB...")
-    })
-    .catch((err) => {
-        console.log("Error al conectarse a la base de datos...", {err});
-    })
+const cookieParser = require('cookie-parser')
 
-// -- Crear el esquema
-const taskSchema = new Schema({
-    name: String,
-    done: Boolean
-})
+const taskRoutes = require("./routes/task")
+const authRoutes = require("./routes/auth")
 
-// -- Crear el modelo
-const Task = mongoose.model("Task", taskSchema, "tasks")
+const { jwtValidation } = require("./middlewares/jwtValidation")
+
+
+// -- Conectar a la base de datos
+dbconnect()
+
+// -- Crear modelos
+const User = require("./models/user")
+const Task = require("./models/task")
+
 
 // -- Middlewares
-app.use(express.static('public'))
+app.use(express.static('public', { extensions: ['html', 'css', 'js'] }));
 app.use(express.json())
+app.use(cookieParser())
 
-// -- Configurar rutas
-app.get("/api/tasks", (req, res) => {
-    Task.find()
-    .then((tasks) => {
-        res.status(200).json({ ok: true, data: tasks})
-    })
-    .catch((err) => {
-        res.status(400).json({ ok: false, message: "Error al obtener las tareas", error: err})
-    })
-})
+// -- Configuración de routers
+app.use("/api/auth", authRoutes)
 
-app.post("/api/tasks", (req, res) => {
-    const body = req.body
-    console.log({ body })
-    Task
-    .create({
-        name: body.text,
-        done: false
-    })
-    .then((createdTask) => {
-        res.status(201).json({ ok: true, message: "Tarea creada con exito", data: createdTask})
-    })
-    .catch((err) => {
-        res.status(400).json({ ok: false, message: "Error al crear la tarea", error: err})
-    })
-})
+// -- Middleware de validación JWT
 
-app.delete("/api/tasks/:id", (req, res) => {
-    const id = req.params.id
-    Task.findByIdAndDelete(id)
-    .then((deletedTask) => {
-        res.status(200).json({ ok: true, message: "Tarea eliminada con exito", data: deletedTask})
-    })
-    .catch((err) => {
-        res.status(400).json({ ok: false, message: "Error al eliminar la tarea", error: err})
-    })
-})
+app.use(jwtValidation)
 
-app.put("/api/tasks/:id", (req, res) => {
-    const body = req.body
-    const id = req.params.id
+// -- Configuración de routers - protegido
+app.use("/api/tasks", taskRoutes)
 
-    Task.findByIdAndUpdate(id, {
-        name: body.text
-    })
-    .then((updateTask) => {
-        res.status(200).json({ ok: true, message: "Tarea editada con exito", data: updateTask})
-    })
-    .catch((err) => {
-        res.status(400).json({ ok: false, message: "Error al editar la tarea", error: err})
-    })
-})
-
+// -- Configurar puerto
+const port = process.env.PORT
 // -- Poner a escuchar el servidor
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
